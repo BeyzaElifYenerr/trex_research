@@ -333,17 +333,17 @@ Veri değişimi için hafif ve okunabilir bir formattır.
 }
 ```
 - Satır Satır Açıklama:
- - id: Tam sayı (int)
- - ad: Metin (string)
- - yas: Tam sayı
- - email: Metin
- - aktif: Boolean (true/false)
- - adres: İç içe nesne (nested object)
- - telefonlar: String dizisi (array)
+  - id: Tam sayı (int)
+  - ad: Metin (string)
+  - yas: Tam sayı
+  - email: Metin
+  - aktif: Boolean (true/false)
+  - adres: İç içe nesne (nested object)
+  - telefonlar: String dizisi (array)
 - Kullanım Amaçları:
- - Web API’lerde veri alışverişi
- - Konfigürasyon dosyaları (appsettings.json)
- - NoSQL veritabanlarında veri depolama (MongoDB vb.)
+  - Web API’lerde veri alışverişi
+  - Konfigürasyon dosyaları (appsettings.json)
+  - NoSQL veritabanlarında veri depolama (MongoDB vb.)
 
 
 
