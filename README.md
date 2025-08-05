@@ -58,7 +58,7 @@ Bir .NET (ASP.NET Core) projesi için tipik CI/CD pipeline adımları:
 6. Publish paketinin oluşturulması (dotnet publish)
 7. Ortam (dev, staging, production) deploy işlemleri
 ##### Azure DevOps ile Pipeline Örneği:
-''' 
+``` 
 trigger:
   - main
 
@@ -87,7 +87,42 @@ steps:
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'drop'
-''' 
+```
+##### GitHub Actions ile Pipeline Örneği:
+```
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
+```
+
 
 
 
