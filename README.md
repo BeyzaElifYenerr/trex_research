@@ -32,7 +32,7 @@
 ##### merge:
 - Belirtilen uzantıyı veya dalı başka bir uzantıyla birleştirir.
 ## Merge Conflict Nedir?
-- Yazılım geliştirme sürecinde iki farklı branchte yapılan değişikliklerin aynı dosyanın aynı satırlarında veya birbirini etkileyen bölgelerinde çakışması durumunda oluşur.
+Yazılım geliştirme sürecinde iki farklı branchte yapılan değişikliklerin aynı dosyanın aynı satırlarında veya birbirini etkileyen bölgelerinde çakışması durumunda oluşur.
 ##### Nasıl Çözülür?
 - Çatışma fark edilir. Git merge veya Git pull yapıldığında Git “merge conflict” uyarısı verir.
 - Çakışmalı dosya açılır. Dosyayı açıldığında iki farklı versiyonun karşılaştırıldığı bir ekran görülür.
@@ -40,7 +40,7 @@
 - Çatışma işaretleri kaldırılır.
 - Dosya kaydedilir ve Git add ile çatışma çözülür.
 ## CI/CD Nedir?
-- Yazılım geliştirme sürecini otomatikleştiren ve yazılım kalitesini artıran iki temel kavramdır.
+Yazılım geliştirme sürecini otomatikleştiren ve yazılım kalitesini artıran iki temel kavramdır.
 ##### CI:
 - Geliştiriciler kodlarını merkezi bir repoya sık sık entegre eder.
 - Her entegrasyonda otomatik olarak testler çalıştırılır ve projenin bozulup bozulmadığı kontrol edilir.
@@ -258,8 +258,92 @@ public async Task GetDataAsync()
 ##### Arrow Function (Lambda) Kullanımı (=>)
 - Lambda expression olarak bilinir ve özellikle kısa fonksiyonlar tanımlar.
 - LINQ sorguları ve event handler’larda yaygındır.
+# 3. Backend Geliştirme Temelleri
+## Back-end Nedir?
+- Bir web sitesinin veya uygulamanın arka planda çalışan, kullanıcının doğrudan görmediği ancak site veya uygulamanın işlevselliğini sağlayan kısımdır.
+- Sunucu tarafında çalışan uygulama mantığını, veri tabanını ve sunucular arasındaki iletişimi içerir.
+- Web sitesinin arka planında çalışan bu bölüm, verilerin işlenmesi, saklanması ve sunucu ile istemci arasındaki veri alışverişinin yönetilmesi gibi önemli işlevleri yerine getirir.
+##### Front-end ve Back-end Arasındaki Farklar
+- Front-end, kullanıcının gördüğü ve etkileşimde bulunduğu her şeyden sorumluyken, Back-end bu işlemlerin arka planda nasıl gerçekleştiğiyle ilgilenir.
+- Front-end geliştiricileri, görsel tasarım ve kullanıcı deneyimine odaklanırken, Back-end geliştiricileri veri işleme, güvenlik ve performans konularında çalışır.
+- Front-end ve Back-end geliştiricileri, kullanıcıların ihtiyaçlarını karşılayan, performanslı ve güvenli web siteleri oluşturmak için birlikte çalışır.
+## Web Sunucusu Nedir?
+- İstemcilerden gelen istekleri alıp işleyerek uygun yanıtları döndüren yazılımsal ya da donanımsal bir sistemdir.
+- En yaygın kullanılan web sunucuları arasında IIS (Windows), Apache ve Nginx yer alır.
+- Bir web sunucusu, HTTP protokolü üzerinden gelen istekleri alır, arka planda ilgili işlemleri yapar ve sonuçları tekrar istemciye iletir.
+## API nedir? 
+- İki yazılım bileşeninin birbirleriyle iletişim kurmasını sağlayan bir arayüzdür.
+- API’ler sayesinde arayüz ve iş mantığı birbirinden ayrılır, bu da sistemlerin modüler, esnek ve kolay yönetilebilir olmasını sağlar.
+##### API Türleri:
+- RESTful API: HTTP protokolü ve JSON formatı ile çalışır, modern ve yaygın bir yaklaşımdır. GET, POST, PUT, DELETE gibi HTTP metodlarını kullanır.
+- SOAP API: XML tabanlıdır, daha katıdır ve genellikle kurumsal sistemlerde tercih edilir. Veri taşıma daha karmaşıktır.
+- GraphQL API: Kullanıcıya ihtiyacı kadar veri alma esnekliği tanır. Tek bir endpoint üzerinden çeşitli veri sorguları yapılabilir.
+- gRPC: Google tarafından geliştirilen, performansı yüksek, ikili veri protokolü (binary) kullanan bir API türüdür. Mikroservislerde yaygınlaşmaktadır.
+##### REST vs SOAP vs GraphQL: Temel Karşılaştırma
+| Özellik          | REST                                   | SOAP                                         | GraphQL                                        |
+|------------------|----------------------------------------|----------------------------------------------|------------------------------------------------|
+| **Veri Formatı** | JSON (genelde)                         | XML                                          | JSON                                           |
+| **Endpoint Kullanımı** | Her kaynak için ayrı endpoint          | Tek endpoint                                 | Tek endpoint                                   |
+| **Performans**   | Yüksek (özellikle mobilde uygun)        | Düşük (XML nedeniyle ağır)                   | Yüksek (veri aşımı olmaz)                      |
+| **Esneklik**     | Orta                                   | Düşük                                        | Çok yüksek (istediğin alanı çekersin)          |
+| **Güvenlik**     | Temel (HTTPS, JWT)                     | Gelişmiş (WS-Security, XML Signature)        | Client güvenliği geliştirilmeli                |
+| **Kullanım Alanı**| Web/Mobil API’ler                      | Finans, bankacılık, devlet sistemleri        | Modern web, frontend tabanlı sistemler         |
+| **Öğrenme Eğrisi**| Kolay                                  | Zor                                          | Orta                                           |
 
-
+## HTTP Nedir?
+-  İstemci (client) ile sunucu (server) arasında veri iletişimi sağlayan bir protokoldür.
+-  Web tarayıcıları, mobil uygulamalar ve API’ler bu protokolü kullanır.
+-  HTTP istekleri belirli metotlarla yapılır.
+##### HTTP Metodları ve Örnekleri:
+| Metot      | Amaç                        | Örnek Senaryo                | Örnek HTTP İsteği              |
+| ---------- | --------------------------- | ---------------------------- | ------------------------------ |
+| **GET**    | Veri çekmek                 | Kullanıcı listesi alma       | `GET /api/users`               |
+| **POST**   | Yeni veri eklemek           | Yeni kullanıcı oluşturma     | `POST /api/users` + JSON body  |
+| **PUT**    | Var olan veriyi güncellemek | Kullanıcı bilgisi değiştirme | `PUT /api/users/5` + JSON body |
+| **DELETE** | Veri silmek                 | Kullanıcı silme              | `DELETE /api/users/5`          |
+## RESTful Servislerin Çalışma Mantığı
+HTTP protokolü üzerine kurulu bir mimari stildir.
+ - Özellikleri:
+  - Kaynaklar (resources) URL ile tanımlanır.
+  - HTTP metodları kullanılır (GET, POST, PUT, DELETE).
+  - Stateless (her istek bağımsızdır, önceki isteklerin bilgisi tutulmaz).
+  - Genellikle JSON veri formatı kullanılır.
+- Örnek:
+  - GET /api/products/10 → ID’si 10 olan ürünü getirir.
+  - DELETE /api/products/10 → ID’si 10 olan ürünü siler.
+## JSON Veri Formatı ve Kullanım Amacı
+Veri değişimi için hafif ve okunabilir bir formattır.
+- Özellikleri:
+  - Anahtar-değer çiftlerinden oluşur.
+  - İnsan ve makine tarafından kolayca anlaşılır.
+  - Web API’lerde en yaygın veri formatıdır.
+##### JSON Örneği:
+```
+{
+  "id": 101,
+  "ad": "Ahmet Yılmaz",
+  "yas": 28,
+  "email": "ahmet@example.com",
+  "aktif": true,
+  "adres": {
+    "sehir": "İstanbul",
+    "postaKodu": "34000"
+  },
+  "telefonlar": ["05321234567", "05419876543"]
+}
+```
+- Satır Satır Açıklama:
+ - id: Tam sayı (int)
+ - ad: Metin (string)
+ - yas: Tam sayı
+ - email: Metin
+ - aktif: Boolean (true/false)
+ - adres: İç içe nesne (nested object)
+ - telefonlar: String dizisi (array)
+- Kullanım Amaçları:
+ - Web API’lerde veri alışverişi
+ - Konfigürasyon dosyaları (appsettings.json)
+ - NoSQL veritabanlarında veri depolama (MongoDB vb.)
 
 
 
