@@ -146,6 +146,64 @@ Bir yazılımın fikir aşamasından kullanıma sunulmasına ve bakımına kadar
 6. Bakım:
 - Hata düzeltmeleri, performans iyileştirmeleri yapılır.
 - Yeni özellikler eklenir.
+##### Agile Nedir?:
+Agile (Çevik), yazılım geliştirmede esneklik, hızlı geri bildirim ve sürekli iyileştirme odaklı bir yaklaşımın genel adıdır.
+Temel prensipler:
+- Müşteri ile sürekli iletişim
+- Küçük, sık teslimatlar
+- Değişen gereksinimlere hızlı uyum
+- Ekip içi iş birliği
+##### Scrum Nedir?
+Scrum, Agile yaklaşımının en çok kullanılan uygulama çerçevesidir. Belirli roller, seremoniler ve artefaktlar içerir.
+Roller:
+- Product Owner → Gereksinimleri belirler, önceliklendirir.
+- Scrum Master → Sürecin doğru işlemesini sağlar, engelleri kaldırır.
+- Development Team → Yazılımı geliştirir.
+Seremoniler:
+- Sprint Planning (Sprint planlama)
+- Daily Scrum (Günlük 15 dk toplantı)
+- Sprint Review (Sprint sonunda gösterim)
+- Sprint Retrospective (Süreç iyileştirme toplantısı)
+Artefaktlar:
+- Product Backlog
+- Sprint Backlog
+- Increment (teslim edilebilir ürün)
+##### Kanban Nedir?
+Kanban, görsel görev yönetimi yöntemidir. Süreç akışını optimize eder, belirli zaman kutularına (sprint) bağlı kalmaz.
+Temel özellikler:
+- Kanban panosu kullanılır:
+ - To Do → Yapılacak işler
+ - In Progress → Devam eden işler
+ - Done → Tamamlanan işler
+- WIP Limit (Work in Progress): Aynı anda devam eden iş sayısı sınırlanır.
+- Sürekli akış vardır, teslimatlar istediğin zaman yapılabilir.
+# 2. .NET Ekosistemi 
+## .Net Nedir?
+- Microsoft tarafından geliştirilen, farklı türde uygulama oluşturmayı sağlayan, ücretsiz ve açık kaynaklı bir yazılım geliştirme platformudur.
+- Geliştiricilere farklı cihaz ve işletim sistemlerinde çalışabilecek modern, güvenli ve yüksek performanslı uygulamalar geliştirme imkânı sunmaktır.
+- Masaüstü, web, mobil, bulut, IoT ve oyun geliştirmede kullanılabilir.
+- Birden fazla programlama dilini, kütüphaneyi ve kitaplığı içerir.
+- Modüler bir mimariye sahiptir.
+- .Net mimarisi 3 temel katmandan oluşur. Bunlar dil, kütüphane ve çalışma zamanıdır.
+
+| Özellik / Sürüm            | **.NET Framework** | **.NET Core** | **.NET 7/8+** *(Modern .NET)* |
+|---------------------------|--------------------|--------------|-----------------------------|
+| **Çıkış Yılı**            | 2002               | 2016         | .NET 5 → 2020<br>.NET 8 → 2023 |
+| **Platform Desteği**      | Sadece **Windows** | **Cross-platform** (Windows, Linux, macOS) | **Tam cross-platform** (Windows, Linux, macOS, Android, iOS, WebAssembly) |
+| **Açık Kaynak**           | ❌ Hayır           | ✅ Evet      | ✅ Evet |
+| **Performans**            | Orta               | Yüksek       | Çok yüksek *(JIT optimizasyonları, NativeAOT vb.)* |
+| **Geliştirme Dilleri**    | C#, VB.NET, F#     | C#, F#       | C#, F# *(VB.NET sınırlı)* |
+| **Kullanım Alanı**        | Eski Windows uygulamaları (WinForms, WPF, ASP.NET) | Modern web, API, konsol, cross-platform uygulamalar | Tüm platformlar için tek kod tabanı *(web, mobil, masaüstü, IoT, bulut)* |
+| **Destek Durumu**         | Sadece bakım modu *(yeni özellik yok)* | Destek bitişi: 2022 | Aktif geliştirme (LTS sürümleri: .NET 6, .NET 8) |
+| **NuGet Desteği**         | ✅ Evet            | ✅ Evet      | ✅ Evet |
+| **Dağıtım**               | Windows Installer  | Self-contained veya framework-dependent | Self-contained, framework-dependent, native |
+| **Web Geliştirme**        | ASP.NET            | ASP.NET Core | ASP.NET Core (güncel sürüm) |
+| **Masaüstü UI**           | WinForms, WPF      | WinForms, WPF *(Windows’ta)* | WinForms, WPF, **.NET MAUI** |
+| **Mobil Geliştirme**      | ❌ Yok             | Xamarin      | **.NET MAUI** (tek kod tabanı ile Android/iOS) |
+
+
+
+
 
 
 
