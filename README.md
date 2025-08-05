@@ -3,6 +3,7 @@
 
 # 1. Modern Yazılım Geliştirme Pratikleri 
 ## Git ve GitHub nedir?
+##### Git
 - fhdgskshfd
 - fghsdjhgjdf
 
