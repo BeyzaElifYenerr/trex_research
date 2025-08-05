@@ -122,6 +122,30 @@ jobs:
       - name: Publish
         run: dotnet publish -c Release -o ./publish
 ```
+## Software Development Life Cycle (SDLC) 
+Bir yazılımın fikir aşamasından kullanıma sunulmasına ve bakımına kadar geçen süreci planlayan yapısal bir yöntemdir.
+1. Planlama:
+- Projenin amacı, kapsamı, bütçesi ve takvimi belirlenir.
+- Risk analizi yapılır.
+- Kaynaklar (ekip, araçlar, teknoloji) planlanır.
+2. Analiz:
+- Müşteri gereksinimleri toplanır ve belgelenir.
+- İşlevsel (functional) ve işlevsel olmayan (non-functional) gereksinimler belirlenir.
+- Gereksinim dokümanları (SRS – Software Requirement Specification) hazırlanır.
+3. Geliştirme:
+- Kodlama süreci başlar.
+- Belirlenen standartlara göre modüller geliştirilir.
+- Sürüm kontrol sistemleri (Git vb.) kullanılır.
+4. Test:
+- Yazılımın hatasız çalışıp çalışmadığı kontrol edilir.
+- Birim testi, entegrasyon testi, sistem testi, kullanıcı kabul testi (UAT) yapılır.
+- Hatalar düzeltilir.
+5. Dağıtım:
+- Yazılım testlerden geçtikten sonra canlı (production) ortama alınır.
+- Müşteri kullanmaya başlar.
+6. Bakım:
+- Hata düzeltmeleri, performans iyileştirmeleri yapılır.
+- Yeni özellikler eklenir.
 
 
 
