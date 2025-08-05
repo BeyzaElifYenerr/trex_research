@@ -201,6 +201,65 @@ Temel özellikler:
 | **Masaüstü UI**           | WinForms, WPF      | WinForms, WPF *(Windows’ta)* | WinForms, WPF, **.NET MAUI** |
 | **Mobil Geliştirme**      | ❌ Yok             | Xamarin      | **.NET MAUI** (tek kod tabanı ile Android/iOS) |
 
+##### .Net --info Çıktısı Örneği:
+```
+.NET SDK:
+ Version:   8.0.100
+ Commit:    123abc456
+
+Runtime Environment:
+ OS Name:     Windows
+ OS Version:  10.0.19045
+ OS Platform: Windows
+ RID:         win10-x64
+ Base Path:   C:\Program Files\dotnet\sdk\8.0.100\
+
+Host:
+  Version:      8.0.0
+  Architecture: x64
+  Commit:       789xyz123
+```
+- .NET SDK: Yüklü SDK sürümünü gösterir (geliştirme için kullanılır).
+- Runtime Environment: OS bilgisi, işlemci mimarisi ve RID (Runtime Identifier) gösterilir.
+- Host: .NET’in çalıştırıcı (runtime) sürümünü ve mimarisini gösterir.
+##### Senkron Programlama:
+- İşlemler ardışık olarak çalışır.
+- Bir işlem bitmeden diğeri başlamaz.
+- Uzun süren işlemler (ör. dosya okuma, API çağrısı) sırasında uygulama bekler ve kullanıcı arayüzü (UI) donar.
+##### Asenkron Programlama:
+- Uzun süren işlemler başka bir iş parçacığında veya non-blocking şekilde çalıştırılır.
+- İşlem bitene kadar uygulama diğer işlere devam edebilir.
+- UI donmaz, kullanıcı deneyimi iyileşir.
+##### .NET’te Asenkron Programlamanın Temel Kavramları
+ ##### Task:
+  - Asenkron bir işlemi temsil eder. Task (void yerine) veya Task<T> (geriye değer döndüren) olarak kullanılır.
+ ##### async:
+  - Bir metodun asenkron çalışacağını belirtir.
+ ##### await:
+  - Asenkron işlemin tamamlanmasını bekler, ancak UI’ı veya ana thread’i kilitlemez.
+ ##### ConfigureAwait(bool):
+  - Await sonrası kaldığın thread’e dönüp dönmeyeceğini kontrol eder. ConfigureAwait(false) genelde UI dışı kodlarda kullanılır (performans için).
+##### Senkron Örnek:
+```
+public void GetData()
+{
+    var data = GetFromApi(); // Bu işlem bitene kadar bekler
+    Console.WriteLine(data);
+}
+```
+##### Asenkron Programlama:
+```
+public async Task GetDataAsync()
+{
+    var data = await GetFromApiAsync(); // Bekler ama UI thread’i kilitlemez
+    Console.WriteLine(data);
+}
+```
+##### Arrow Function (Lambda) Kullanımı (=>)
+- Lambda expression olarak bilinir ve özellikle kısa fonksiyonlar tanımlar.
+- LINQ sorguları ve event handler’larda yaygındır.
+
+
 
 
 
