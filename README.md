@@ -389,6 +389,8 @@ ASP.NET Core’da istek (request) ve yanıt (response) sürecinde araya giren k�
   1. İsteği işler (gerekirse değiştirir),
   2. Bir sonraki middleware’e iletir,
   3. Dönüşte (response) de veriyi değiştirebilir.
+![Middleware Cycle](https://github.com/user-attachments/assets/e13262f9-21b0-41b4-a6bb-279dbe0900b3)
+
 
   
 
