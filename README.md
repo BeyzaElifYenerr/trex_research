@@ -407,7 +407,7 @@ app.UseEndpoints(endpoints =>
 
 app.Run();
 ```
-** NOT: Middleware sırası çok önemlidir. Örneğin UseAuthorization() kimlik doğrulamadan önce gelirse yetkilendirme çalışmaz. ** 
+** NOT: Middleware sırası çok önemlidir. Örneğin UseAuthorization() kimlik doğrulamadan önce gelirse yetkilendirme çalışmaz. **
 
 
   
