@@ -386,9 +386,10 @@ Mvc mimarisi üç parçadan oluşur. Bunlar Model, View ve Controller olarak par
 ## Middleware Nedir, Nasıl Çalışır?
 ASP.NET Core’da istek (request) ve yanıt (response) sürecinde araya giren küçük yazılım bileşenleridir.
 - Her middleware:
-  1. İsteği işler (gerekirse değiştirir),
-  2. Bir sonraki middleware’e iletir,
-  3. Dönüşte (response) de veriyi değiştirebilir.
+ 1. İsteği işler (gerekirse değiştirir),
+ 2. Bir sonraki middleware’e iletir,
+ 3. Dönüşte (response) de veriyi değiştirebilir.
+
 ![Middleware Cycle](https://github.com/user-attachments/assets/b75fa3de-8786-4d87-975e-53807055a864)
 
 
