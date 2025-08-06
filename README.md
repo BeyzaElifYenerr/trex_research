@@ -344,6 +344,37 @@ Veri değişimi için hafif ve okunabilir bir formattır.
   - Web API’lerde veri alışverişi
   - Konfigürasyon dosyaları (appsettings.json)
   - NoSQL veritabanlarında veri depolama (MongoDB vb.)
+# ASP.NET
+## ASP.NET Nedir?
+- Microsoft tarafından geliştirilen, .NET Framework üzerine kurulu bir web uygulama geliştirme platformudur.
+- Sadece Windows üzerinde çalışır.
+- Web Forms, MVC, Web API gibi farklı geliştirme modelleri içerir.
+- Kullanım Alanları:
+ - Web siteleri
+ - Web tabanlı uygulamalar
+ - Web servisleri (SOAP/REST)
+## ASP.NET Core Nedir?
+- Microsoft’un geliştirdiği yeni nesil, açık kaynak, cross-platform web geliştirme platformudur.
+- .NET Core ve .NET 5/6/7/8+ üzerinde çalışır.
+- Windows, Linux, macOS gibi farklı platformlarda çalışabilir.
+- Performans, esneklik ve bulut uyumluluğu yüksek olacak şekilde yeniden tasarlandı.
+- Kullanım Alanları:
+  - Modern web uygulamaları
+  - RESTful API’ler
+  - Gerçek zamanlı uygulamalar (SignalR)
+  - Mikroservis mimarisi
+## Avantajlar ve Farklar
+| Avantaj               | ASP.NET                 | ASP.NET Core                                     |
+| --------------------- | ----------------------- | ------------------------------------------------ |
+| **Performans**        | Orta                    | Çok yüksek (Kestrel web sunucusu, modern mimari) |
+| **Platform Desteği**  | Sadece Windows          | Cross-platform (Windows, Linux, macOS)           |
+| **Açık Kaynak**       | ❌ Hayır                 | ✅ Evet                                           |
+| **Modülerlik**        | Daha az                 | Çok modüler (kütüphaneler paketler halinde)      |
+| **Bulut Uyumu**       | Orta                    | Yüksek (Azure, AWS, Docker uyumlu)               |
+| **Geliştirme Modeli** | Web Forms, MVC, Web API | MVC, Razor Pages, Blazor, Minimal API            |
+| **Güncel Destek**     | Sadece bakım modu       | Aktif geliştirme ve yeni özellikler              |
+
+
 
 
 
