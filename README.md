@@ -472,6 +472,226 @@ builder.Services.AddScoped<IProductService, ProductService>();
 ↓
 [Database] → SQL Server, PostgreSQL, vb.
 `````
+## 5. Veritabanı ve ORM
+## SQL Nedir?
+SQL (Structured Query Language), veritabanları ile iletişim kurmak için kullanılan standart sorgu dilidir.
+- Veri ekleme, silme, güncelleme, sorgulama işlemlerinde kullanılır.
+- MySQL, SQL Server, PostgreSQL, Oracle gibi sistemlerde kullanılır.
+## İlişkisel ve İlişkisel Olmayan Veritabanı Farkları
+| Özellik         | İlişkisel Veritabanı (RDBMS)  | İlişkisel Olmayan Veritabanı (NoSQL) |
+| --------------- | ----------------------------- | ------------------------------------ |
+| Veri Yapısı     | Tablo (satır/sütun)           | JSON, doküman, anahtar-değer, grafik |
+| Şema            | Sabit şema                    | Esnek şema                           |
+| Örnek Sistemler | SQL Server, MySQL, PostgreSQL | MongoDB, Redis, Cassandra            |
+| Kullanım Alanı  | Finans, ERP, CRM              | Büyük veri, gerçek zamanlı analiz    |
+| Sorgu Dili      | SQL                           | Kendi sorgu dili veya API            |
+## ORM Nedir?
+- ORM (Object Relational Mapping), veritabanı tablolarını nesneler olarak temsil eden bir teknolojidir.
+- SQL yazmadan, nesneler üzerinden veri işlemleri yapmamızı sağlar.
+## Entity Framework Core Nedir?
+- Entity Framework Core (EF Core), Microsoft’un .NET için geliştirdiği modern ORM aracıdır.
+- Cross-platform çalışır.
+- LINQ desteği vardır.
+- Code-First ve Database-First yaklaşımlarını destekler.
+## DbContext Nedir, Nasıl Kullanılır?
+- DbContext, EF Core’da veritabanı ile uygulama arasındaki köprüdür.
+- Tablolar için DbSet<T> tanımlanır.
+- CRUD işlemleri buradan yapılır.
+##### Örnek:
+```
+public class AppDbContext : DbContext
+{
+    public DbSet<Product> Products { get; set; }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+}
+```
+## LINQ Nedir?
+- LINQ (Language Integrated Query), C# içinde veri sorgulama imkanı sunar.
+- SQL benzeri sorgular, koleksiyonlar ve veritabanları üzerinde çalışabilir.
+##### Yaygın LINQ Örnekleri:
+```
+// Filtreleme (Where)
+var expensive = products.Where(p => p.Price > 1000);
+
+// Sıralama (OrderBy / OrderByDescending)
+var sorted = products.OrderBy(p => p.Name);
+
+// İlk/tek kayıt (First / Single)
+var first = products.First(p => p.Id == 1);
+
+// Projeksiyon (Select)
+var names = products.Select(p => p.Name);
+```
+##### LINQ → SQL Karşılaştırması
+| LINQ                                  | SQL                                          |
+| ------------------------------------- | -------------------------------------------- |
+| `products.Where(p => p.Price > 1000)` | `SELECT * FROM Products WHERE Price > 1000;` |
+| `products.OrderBy(p => p.Name)`       | `SELECT * FROM Products ORDER BY Name ASC;`  |
+| `products.Select(p => p.Name)`        | `SELECT Name FROM Products;`                 |
+| `products.First(p => p.Id == 1)`      | `SELECT TOP 1 * FROM Products WHERE Id = 1;` |
+## Code-First
+- Önce kod tarafında (C# sınıfları ile) veri modelleri tanımlanır.
+- Entity Framework (EF) bu modellere göre veritabanı şemasını otomatik oluşturur.
+- Veritabanı migration (göç) komutlarıyla güncellenir.
+## Database-First
+- Önce veritabanı (SQL Server, MySQL, vb.) oluşturulur.
+- EF, mevcut veritabanı şemasına göre C# sınıflarını otomatik üretir.
+- Bu işlem için Scaffold-DbContext komutu kullanılır.
+
+| Özellik                  | Code-First           | Database-First              |
+| ------------------------ | -------------------- | --------------------------- |
+| **Başlangıç Noktası**    | Kod (C# sınıfları)   | Mevcut veritabanı           |
+| **Veritabanı Oluşturma** | EF migration ile     | Önceden tasarlanmış         |
+| **Esneklik**             | Yüksek (kod odaklı)  | Orta (DB odaklı)            |
+| **En Uygun Olduğu Yer**  | Yeni projeler        | Mevcut DB ile entegrasyon   |
+| **Bağımlılık**           | Kod tabanına bağımlı | Veritabanı şemasına bağımlı |
+## Temel SQL sorguları: SELECT, INSERT, UPDATE, DELETE
+- SELECT (Veri Çekme)
+```
+SELECT * FROM Products;
+SELECT Name, Price FROM Products WHERE Price > 1000;
+```
+- INSERT (Veri Ekleme)
+```
+INSERT INTO Products (Name, Price) VALUES ('Laptop', 15000);
+```
+- UPDATE (Veri Güncelleme)
+```
+UPDATE Products SET Price = 14000 WHERE Id = 1;
+```
+- DELETE (Veri Silme)
+```
+DELETE FROM Products WHERE Id = 1;
+```
+# 6. Güvenlik ve Performans
+## Authentication
+- Kullanıcının kim olduğunu doğrulama süreci.
+- Örnek: Kullanıcı adı/şifre ile giriş yapması.
+## Authorization
+-  Doğrulanan kullanıcının hangi işlemleri yapabileceğini belirleme süreci.
+-  Örnek: Admin kullanıcı ürün silebilir ama normal kullanıcı silemez.
+## JWT (JSON Web Token) Nedir?
+- İstemci ile sunucu arasında güvenli bilgi taşımak için kullanılan, JSON tabanlı bir token formatıdır.
+- Genellikle Bearer Token olarak HTTP Authorization header'ında gönderilir.
+- Stateless çalışır (sunucu tarafında session saklanmaz).
+##### Header
+- JWT’nin türünü ve imzalama algoritmasını belirtir.
+- Alanlar:
+  - alg → İmzalama algoritması (HS256 = HMAC-SHA256, RS256 = RSA-SHA256 vb.)
+  - typ → Token tipi (genelde "JWT")
+- Örnek JSON:
+```
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+##### Payload
+- Kullanıcıya ait bilgileri (claims) taşır.
+- Claims Türleri:
+  - Registered claims (standart alanlar): sub (subject), iat (issued at), exp (expiration time) vb.
+  - Public claims (genel alanlar)
+  - Private claims (uygulamaya özel alanlar)
+- Örnek JSON:
+```
+{
+  "userId": "1234",
+  "role": "Admin",
+  "exp": 1735689600
+}
+```
+**exp değeri token’ın ne zaman geçersiz olacağını Unix zaman damgası olarak belirtir.**
+##### Signature
+- Token’ın değiştirilip değiştirilmediğini doğrulamak.
+- Oluşumu:
+```
+Signature = HMACSHA256(
+    Base64UrlEncode(Header) + "." + Base64UrlEncode(Payload),
+    SecretKey
+)
+```
+- Mantık: Header + Payload birleşip gizli anahtar ile imzalanır. İmzayı doğrulamak için aynı işlem sunucuda yapılır, uyuşmazsa token geçersizdir.
+##### JWT Akış Mantığı
+ 1. Kullanıcı giriş yapar, kimlik doğrulama başarılı olursa sunucu JWT üretir.
+ 2. Sunucu JWT’yi istemciye gönderir.
+ 3. İstemci sonraki isteklerde JWT’yi Authorization: Bearer <token> başlığı ile gönderir.
+ 4. Sunucu JWT’nin imzasını ve süresini kontrol eder.
+ 5. Token geçerliyse işlem yapılır.
+## OAuth, OAuth2.0, OpenID Connect, OpenIddict
+- OAuth → Üçüncü taraf uygulamalara belirli kaynaklara erişim yetkisi verme standardı. (ör: "Google ile Giriş Yap" → senin şifreni paylaşmadan Google hesabına erişim izni vermek)
+- OAuth 2.0 → OAuth'un modern ve daha güvenli versiyonu.
+- OpenID Connect (OIDC) → OAuth 2.0 üzerine kimlik doğrulama katmanı ekler.
+- OpenIddict → ASP.NET Core uygulamalarında OAuth 2.0 ve OpenID Connect tabanlı kimlik doğrulama için kullanılan bir kütüphane.
+## Performans artımı için ne yapılabilir?
+- AsNoTracking
+  - EF Core sorgularında AsNoTracking() kullanmak, EF’nin entity'leri takip etmesini engeller.
+  - Okuma odaklı sorgularda performans artışı sağlar.
+```
+var products = context.Products.AsNoTracking().ToList();
+```
+- IAsyncEnumerable
+  - Verileri streaming şeklinde (parça parça) çekerek bellekte yüklenmeyi azaltır.
+  - Özellikle büyük veri setlerinde daha az bellek kullanır.
+```
+await foreach (var product in context.Products.AsAsyncEnumerable())
+{
+    Console.WriteLine(product.Name);
+}
+```
+- Caching (Önbellekleme)
+  - Sık kullanılan verileri bellek, Redis gibi sistemlerde saklamak, tekrar tekrar veritabanına gitmeyi engeller.
+  - Örnek: MemoryCache, DistributedCache, Redis Cache.
+- Profiling
+  - Performans darboğazlarını tespit etmek için sorgu ve işlem sürelerini izleme.
+  - EF Core LogTo ile SQL sorgularını görebilir veya MiniProfiler kullanabilirsin.
+- Redis
+  - Dağıtık ve yüksek hızlı cache sistemi.
+  - API yanıtlarını veya session verilerini saklamak için kullanılabilir.
+## OWASP Top 10
+| No     | Açık Adı                                     | Kısa Açıklama                                                                               |
+| ------ | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **1**  | **Broken Access Control**                    | Yetkilendirme hataları → Kullanıcı, erişmemesi gereken verilere/işlemlere erişebilir.       |
+| **2**  | **Cryptographic Failures**                   | Zayıf veya yanlış şifreleme → Hassas veriler korunmaz, çalınabilir.                         |
+| **3**  | **Injection (SQL Injection)**                | Kullanıcı girdisi filtrelenmeden sorguya eklenir, saldırgan veri tabanına komut çalıştırır. |
+| **4**  | **Insecure Design**                          | Başta güvenlik düşünülmeden yapılan tasarım → Açıklara sebep olur.                          |
+| **5**  | **Security Misconfiguration**                | Yanlış güvenlik ayarları (varsayılan şifreler, açık portlar) → Sistemi savunmasız bırakır.  |
+| **6**  | **Vulnerable Components**                    | Eski ve güvenlik açığı olan kütüphanelerin/projelerin kullanılması.                         |
+| **7**  | **Identification & Authentication Failures** | Kimlik doğrulama mekanizmaları zayıfsa, saldırgan başkası gibi giriş yapabilir.             |
+| **8**  | **Software & Data Integrity Failures**       | Kod veya verinin yetkisiz şekilde değiştirilmesi → Zararlı kod çalıştırma riski.            |
+| **9**  | **Security Logging & Monitoring Failures**   | Olayların kaydedilmemesi → Saldırılar fark edilmez.                                         |
+| **10** | **Server-Side Request Forgery (SSRF)**       | Sunucu, saldırganın istediği bir dış kaynağa istek gönderir → Veri sızıntısı.               |
+##### SQL Injection 
+- Kullanıcı girişine girilen zararlı SQL kodu veritabanında çalışır.
+- Örnek (yanlış kullanım):
+```
+SELECT * FROM Users WHERE Username = '" + userInput + "'";
+```
+- Saldırgan şunu girebilir: ' OR '1'='1 → Tüm kullanıcılar listelenir.
+##### XSS (Cross-Site Scripting) 
+- Web sayfasına zararlı JavaScript kodu eklenir, kullanıcı tarayıcısında çalışır.
+##### CSRF (Cross-Site Request Forgery) 
+- Kullanıcı farkında olmadan başka bir site üzerinden yetkili işlemler yaptırılır (örneğin banka havalesi).
+##### Broken Authentication
+- Kimlik doğrulama hataları → Şifre tahmini, oturum çalma gibi sorunlar.
+#####  ASP.NET Core ile Alınabilecek Önlemler
+| Açık Türü                 | ASP.NET Core Önlemleri                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------- |
+| **SQL Injection**         | Parametreli sorgular veya LINQ kullan, `FromSqlInterpolated` ile güvenli SQL yaz.                 |
+| **XSS**                   | Razor otomatik HTML encode yapar, kullanıcı girdilerini encode et.                                |
+| **CSRF**                  | Formlarda `@Html.AntiForgeryToken()` kullan, `ValidateAntiForgeryToken` ekle.                     |
+| **Broken Authentication** | ASP.NET Identity veya JWT ile güçlü kimlik doğrulama, şifre karma (hash) kullan.                  |
+| **Model Validation**      | `[Required]`, `[MaxLength]`, `[EmailAddress]` gibi Data Annotations ile giriş verilerini doğrula. |
+| **Input Sanitization**    | HTML, JavaScript gibi zararlı girdileri temizle (ör. HtmlSanitizer).                              |
+
+
+
+
+
+
+
+
+
 
 
 
