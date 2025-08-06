@@ -392,6 +392,23 @@ ASP.NET Core’da istek (request) ve yanıt (response) sürecinde araya giren k�
 
 ![Middleware Cycle](https://github.com/user-attachments/assets/b75fa3de-8786-4d87-975e-53807055a864)
 
+##### Startup.cs / Program.cs Middleware Sırası Örneği:
+```
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.UseRouting();          // 1. Rotalama bilgisi hazırlanır
+app.UseAuthentication();   // 2. Kimlik doğrulama yapılır
+app.UseAuthorization();    // 3. Yetkilendirme yapılır
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+app.Run();
+```
+** NOT: Middleware sırası çok önemlidir. Örneğin UseAuthorization() kimlik doğrulamadan önce gelirse yetkilendirme çalışmaz. ** 
+
 
   
 
