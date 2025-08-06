@@ -1069,6 +1069,165 @@ shape.Draw();
 | **Microservices**      | Bağımsız deploy edilen servisler                   | Yüksek trafik, ölçeklenebilir sistemler |
 | **Event-Driven**       | Olay tabanlı iletişim                              | Gerçek zamanlı ve asenkron sistemler    |
 | **Hexagonal**          | Ports & Adapters ile teknoloji bağımsız yapı       | Çok istemcili, esnek projeler           |
+## Katmanlı Mimari Nedir?
+- Uygulamanın farklı sorumluluklarını ayırmak için kodu mantıksal katmanlara bölen mimari yaklaşımdır.
+- En yaygın hali 3 katman (bazı projelerde 4) şeklindedir:
+  1. Presentation Layer (Sunum Katmanı)
+  2. Business Layer (İş Mantığı Katmanı)
+  3. Data Access Layer (Veri Erişim Katmanı)
+  4. Database (Veritabanı Katmanı)
+## Katmanlar ve Görevleri
+- Presentation Layer (Sunum Katmanı)
+  - Kullanıcı ile etkileşim katmanıdır.
+  - Web uygulamalarında Controller, View, API endpoint burada bulunur.
+  - İş mantığını Business Layer’a iletir, dönen veriyi kullanıcıya gösterir.
+  - ASP.NET Core MVC’de: Controller + View
+  - ASP.NET Core API’de: Controller
+- Örnek: Kullanıcı "Ürün Listesi" sayfasını açtığında Controller, Business Layer’dan veriyi ister.
+- Business Layer (İş Mantığı Katmanı)
+  - Uygulamanın kurallarını ve iş mantığını barındırır.
+  - Veriler üzerinde hesaplama, validasyon, işlem akışları bu katmanda yapılır.
+  - Data Access Layer’dan veri çeker, gerekli işlemleri yapar ve Presentation Layer’a döner.
+  - Servis (Service) ve iş mantığı sınıfları burada bulunur.
+- Örnek: Ürün fiyatına KDV ekleme, stok kontrolü yapma.
+- Data Access Layer (Veri Erişim Katmanı)
+  - Veritabanı ile doğrudan iletişim kurar.
+  - CRUD işlemleri burada yapılır.
+  - Entity Framework, Dapper, ADO.NET gibi teknolojiler kullanılır.
+  - Repository Pattern bu katmanda sıkça kullanılır.
+- Örnek: ProductRepository.GetAll() → SQL sorgusunu çalıştırır ve veriyi döner.
+- Database (Veritabanı Katmanı)
+  - Verilerin fiziksel olarak saklandığı yerdir.
+  - SQL Server, PostgreSQL, MySQL gibi veritabanı sistemleri kullanılır.
+- Örnek: Products tablosu, Orders tablosu.
+## Katmanların İlişkisi
+````
+[Presentation Layer] → Controller / View / API
+        ↓
+[Business Layer] → Servisler, iş kuralları
+        ↓
+[Data Access Layer] → Repository, Entity Framework
+        ↓
+[Database] → SQL Server, PostgreSQL
+````
+- Presentation Layer, Business Layer’a bağımlıdır.
+- Business Layer, Data Access Layer’a bağımlıdır.
+- Data Access Layer, veritabanına bağımlıdır.
+## Service & Repository Pattern
+- Service Pattern: Business Layer’da kullanılır, iş mantığını merkezi bir yerde toplar.
+- Repository Pattern: Data Access Layer’da kullanılır, veritabanı erişim detaylarını soyutlar.
+- Örnek:
+```
+// Business Layer
+public class ProductService
+{
+    private readonly IProductRepository _repo;
+    public ProductService(IProductRepository repo) => _repo = repo;
+
+    public IEnumerable<Product> GetAllProductsWithTax()
+    {
+        var products = _repo.GetAll();
+        foreach (var p in products) p.Price *= 1.18m;
+        return products;
+    }
+}
+```
+## Clean Architecture Nedir?
+- Yazılımı esnek, test edilebilir ve teknoloji bağımsız hale getirmek.
+- Geleneksel katmanlı mimaride bağımlılıklar yukarıdan aşağıya akar (Presentation → Business → Data Access → Database).
+- Clean Architecture’da ise bağımlılıklar merkeze doğru akar (dış katmanlar iç katmanlara bağımlı, ama tersi değil).
+## Katmanlar
+- Domain Katmanı (En içte)
+   - İş kurallarını ve temel modellemeleri barındırır.
+  - Framework, veritabanı, UI gibi teknolojilerden tamamen bağımsızdır.
+  - Entity’ler, Value Object’ler, Domain Service’ler bu katmanda olur.
+- Örnek:
+```
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+
+    public decimal GetPriceWithTax(decimal taxRate) => Price * (1 + taxRate);
+}
+```
+- Application Katmanı
+  - Use Case’leri (iş akışları) içerir.
+  - Domain katmanındaki kuralları kullanarak uygulama senaryolarını yürütür.
+  - Arayüzler (Interfaces) burada tanımlanır.
+  - Infrastructure katmanı bu arayüzleri implement eder.
+- Örnek:
+```
+public interface IProductRepository
+{
+    Task<Product> GetByIdAsync(int id);
+}
+
+public class GetProductUseCase
+{
+    private readonly IProductRepository _repo;
+    public GetProductUseCase(IProductRepository repo) => _repo = repo;
+
+    public async Task<Product> ExecuteAsync(int id)
+    {
+        return await _repo.GetByIdAsync(id);
+    }
+}
+```
+- Infrastructure Katmanı
+  - Uygulamanın dış dünya ile iletişim kurduğu yerdir.
+  - Veritabanı erişimi, API çağrıları, e-posta servisleri vb.
+  - Application katmanındaki interface’leri implement eder.
+- Örnek:
+```
+public class EfProductRepository : IProductRepository
+{
+    private readonly AppDbContext _context;
+    public EfProductRepository(AppDbContext context) => _context = context;
+
+    public async Task<Product> GetByIdAsync(int id)
+    {
+        return await _context.Products.FindAsync(id);
+    }
+}
+```
+- API / UI Katmanı (En dışta)
+  - Kullanıcı ile doğrudan etkileşim kurar.
+  - Controller’lar, View’lar veya API endpoint’leri burada bulunur.
+  - Application katmanındaki Use Case’leri çağırır.
+- Örnek:
+```
+[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private readonly GetProductUseCase _useCase;
+    public ProductsController(GetProductUseCase useCase) => _useCase = useCase;
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(int id)
+    {
+        var product = await _useCase.ExecuteAsync(id);
+        return Ok(product);
+    }
+}
+```
+- Bağımlılıkların Dışa Akması İlkesi
+- Geleneksel katmanlı mimaride:
+  - Presentation → Business → Data Access → Database
+- Clean Architecture’da:
+  - Domain/Application bağımsızdır.
+  - Infrastructure (DB, API, Framework) Application’a bağımlıdır.
+- Basit şema:
+````
+[API/UI] → [Infrastructure] → [Application] → [Domain]
+````
+- Bu sayede:
+  - Veritabanı teknolojisini değiştirmek kolaydır (EF Core → Dapper).
+  - API yerine Console uygulaması eklemek mümkündür.
+  - Testlerde sahte (mock) implementasyonlar kullanılabilir.
+
 
 
 
