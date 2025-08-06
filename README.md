@@ -408,6 +408,72 @@ app.UseEndpoints(endpoints =>
 app.Run();
 ```
 **NOT: Middleware sırası çok önemlidir. Örneğin UseAuthorization() kimlik doğrulamadan önce gelirse yetkilendirme çalışmaz.**
+## Worker ve Background Job Nedir?
+##### Worker Service
+- .NET uygulamalarında arka planda kesintisiz çalışan servislerdir.
+- Genellikle zamanlanmış görevler, mesaj kuyruğu dinleyicileri veya sürekli izleme işlemleri için kullanılır.
+##### Background Job 
+- ASP.NET Core içinde tanımlanan, genellikle kullanıcı etkileşimi sonrası tetiklenen, kısa süreli asenkron işlemlerdir.
+- Örneğin: Bir kullanıcı kayıt olduğunda ona e-posta göndermek, bir dosya yüklenince thumbnail oluşturmak gibi görevlerdir.
+
+| Özellik           | Worker Service                           | Background Job                                  |
+|-------------------|------------------------------------------|------------------------------------------------|
+| **Çalışma Süresi**| Sürekli                                  | Tetiklendiğinde çalışır                        |
+| **Web’e Bağımlılık** | Bağımsız çalışabilir                    | Genelde ASP.NET uygulamasına bağlıdır          |
+| **Kullanım Alanı**| Cron job, loglama, queue işleme          | E-posta, PDF üretme, görsel sıkıştırma         |
+| **Oluşturma Şekli**| `dotnet new worker` ile proje oluşturulur| `IHostedService`, `BackgroundService`, Hangfire|
+| **Yaygın Örnek**  | Docker'da sürekli çalışan servis         | Web API içinde gecikmeli işlem                 |
+## Dependency Injection (DI) Nedir? 
+- Bir sınıfın ihtiyaç duyduğu bağımlılıkları (örneğin servisler, veritabanı erişimi) kendi içinde oluşturmaması, bunun yerine dışarıdan alması prensibidir.
+- ASP.NET Core, yerleşik bir DI altyapısı ile birlikte gelir. Bu yapı sayesinde uygulamalar daha esnek, test edilebilir ve modüler hale gelir.
+```
+// Interface
+public interface IProductService
+{
+    List<string> GetProducts();
+}
+
+// Service
+public class ProductService : IProductService
+{
+    public List<string> GetProducts() => new List<string> { "Laptop", "Telefon" };
+}
+
+// Controller
+public class ProductController : ControllerBase
+{
+    private readonly IProductService _productService;
+    
+    public ProductController(IProductService productService) // DI ile geliyor
+    {
+        _productService = productService;
+    }
+
+    [HttpGet]
+    public IActionResult Get() => Ok(_productService.GetProducts());
+}
+```
+Program.cs’da DI Kaydı:
+```
+builder.Services.AddScoped<IProductService, ProductService>();
+```
+Çalışma Mantığı:
+ 1. Kullanıcı GET /product isteği gönderir.
+ 2. ASP.NET Core, ProductController’ı oluşturur.
+ 3. Controller’ın constructor’ında IProductService istenir → DI Container ProductService’i oluşturur ve verir.
+ 4. Get() metodu çağrılır → Servisten veri alınır → JSON olarak döner.
+##### ASP.NET Core Katmanlı Mimari
+`````
+[Presentation Layer] → Controller / View / API
+↓
+[Business Layer] → Servisler (iş mantığı)
+↓
+[Data Access Layer] → Repository, Entity Framework
+↓
+[Database] → SQL Server, PostgreSQL, vb.
+`````
+
+
 
 
   
