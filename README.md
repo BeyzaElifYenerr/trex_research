@@ -350,9 +350,9 @@ Veri değişimi için hafif ve okunabilir bir formattır.
 - Sadece Windows üzerinde çalışır.
 - Web Forms, MVC, Web API gibi farklı geliştirme modelleri içerir.
 - Kullanım Alanları:
- - Web siteleri
- - Web tabanlı uygulamalar
- - Web servisleri (SOAP/REST)
+  - Web siteleri
+  - Web tabanlı uygulamalar
+  - Web servisleri (SOAP/REST)
 ## ASP.NET Core Nedir?
 - Microsoft’un geliştirdiği yeni nesil, açık kaynak, cross-platform web geliştirme platformudur.
 - .NET Core ve .NET 5/6/7/8+ üzerinde çalışır.
@@ -373,7 +373,24 @@ Veri değişimi için hafif ve okunabilir bir formattır.
 | **Bulut Uyumu**       | Orta                    | Yüksek (Azure, AWS, Docker uyumlu)               |
 | **Geliştirme Modeli** | Web Forms, MVC, Web API | MVC, Razor Pages, Blazor, Minimal API            |
 | **Güncel Destek**     | Sadece bakım modu       | Aktif geliştirme ve yeni özellikler              |
+## Model-View-Controller (MVC) Nedir?
+- Verinin farklı görselleştirme yöntemleriyle kullanıcıya sunulduğu, uygulamaların geliştirilmesinde kullanılan bir yazılım kalıbıdır.
+- Yazılan uygulamanın iş mantığı ile kullanıcı arayüzünün, farklı hedefleri olan kısımlarının birbirinden ayrılmasını sağlar.
+- Milyonlarca verinin olduğu karmaşık uygulamalarda verileri somutlaştırarak ve kodları birbirinden ayırarak geliştirmeyi daha kolay hale getirir.
+- Masaüstü, web ve mobil uygulamaların hepsinde kullanılabilir. Nesne yönelimli programlama ile çalışabilir.
+## MVC Çalışma Mantığı
+Mvc mimarisi üç parçadan oluşur. Bunlar Model, View ve Controller olarak parçalara ayrılır. MVC mimarisi şu şekilde çalışır: Tarayıcıdan View sayfasına istek yapıldığında, View katmanı Controller’a gider. Controller isteği gerçekleştirmek üzere Model katmanına gider. Daha sonra Model'den alınan veriler, View’a gönderilerek istenilen verilerin görüntülenmesi sağlanır. En basit anlamda MVC, bir uygulamayı üç alana ayırma çabasıdır. 
+- Model: MVC mimarisi içinde verilerin tutulduğu, veri tabanına erişimin sağlandığı, tüm data işlemlerinin gerçekleştiği yer model katmanıdır.
+- View: Model katmanının görselleştirilmiş, kullanıcının uygulamayı gördüğü halidir.
+- Controller: Model ve View katmanları arasındaki işlemleri gerçekleştirir. Yani View katmanından aldığı veri tabanı işlemleri ve hesaplamalar gibi tüm işlemleri Model katmanına taşır. Bir nevi arada köprü görevi görür.
+## Middleware Nedir, Nasıl Çalışır?
+ASP.NET Core’da istek (request) ve yanıt (response) sürecinde araya giren küçük yazılım bileşenleridir.
+- Her middleware:
+  1. İsteği işler (gerekirse değiştirir),
+  2. Bir sonraki middleware’e iletir,
+  3. Dönüşte (response) de veriyi değiştirebilir.
 
+  
 
 
 
