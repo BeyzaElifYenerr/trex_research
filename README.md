@@ -683,6 +683,233 @@ SELECT * FROM Users WHERE Username = '" + userInput + "'";
 | **Broken Authentication** | ASP.NET Identity veya JWT ile güçlü kimlik doğrulama, şifre karma (hash) kullan.                  |
 | **Model Validation**      | `[Required]`, `[MaxLength]`, `[EmailAddress]` gibi Data Annotations ile giriş verilerini doğrula. |
 | **Input Sanitization**    | HTML, JavaScript gibi zararlı girdileri temizle (ör. HtmlSanitizer).                              |
+# 7. Logging ve Hata Yönetimi
+## Neden Loglama Yapılır?
+- Loglama, uygulamanın çalışması sırasında önemli olayları, hataları ve sistem bilgilerini kayıt altına alma işlemidir.
+- Amaçları:
+  - Hata ayıklama (debugging)
+  - Uygulama davranışını izleme
+  - Güvenlik olaylarını takip etme
+  - Performans sorunlarını tespit etme
+  - Kullanıcı aktivitelerini inceleme
+## Log Seviyesi Nedir?
+Log seviyeleri, kaydın önem derecesini belirler. ASP.NET Core’da en yaygın log seviyeleri:
+| Seviye          | Açıklama                                                        | Örnek                       |
+| --------------- | --------------------------------------------------------------- | --------------------------- |
+| **Trace**       | En detaylı loglar, genellikle geliştirme aşamasında kullanılır. | Metot giriş-çıkış bilgileri |
+| **Debug**       | Hata ayıklama amaçlı, normalde production’da kapalıdır.         | Değişken değerleri          |
+| **Information** | Uygulamada gerçekleşen normal olaylar.                          | Kullanıcı giriş yaptı       |
+| **Warning**     | Potansiyel sorunlar.                                            | Disk alanı azalıyor         |
+| **Error**       | Hata oluştu ama uygulama çalışmaya devam edebilir.              | API isteği başarısız        |
+| **Critical**    | Ciddi hata, uygulamanın durmasına sebep olabilir.               | Veritabanı bağlantısı koptu |
+## ASP.NET Core’da Logging Altyapısı
+- ASP.NET Core’da yerleşik Microsoft.Extensions.Logging kütüphanesi vardır.
+- Varsayılan olarak Console, Debug, EventSource gibi sağlayıcılar eklenebilir.
+- Üçüncü taraf sağlayıcılar (Serilog, NLog, log4net) ile gelişmiş loglama yapılabilir.
+Program.cs Örneği:
+```
+var builder = WebApplication.CreateBuilder(args);
+
+// Log seviyesini ayarlama
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
+var app = builder.Build();
+```
+## Global Exception Handling
+- Uygulamada oluşan tüm beklenmeyen hataları tek bir noktadan yakalamak için kullanılır.
+- Bunun amacı:
+ - Hataları merkezi bir yerde loglamak,
+ - Kullanıcıya güvenli ve standart bir cevap dönmek,
+ - Teknik detayları dışarı sızdırmamak.
+##### UseExceptionHandler Nedir?
+- ASP.NET Core’da global exception handling yapmak için kullanılan yerleşik bir middleware’dir.
+- Uygulamada beklenmeyen bir hata olduğunda, istek akışını özel belirlediğin bir endpoint’e yönlendirir.
+- Bu endpoint’te hatayı yakalayıp loglayabilir ve kullanıcıya standart bir cevap dönebilirsin.
+- Production ortamında önerilir çünkü kullanıcıya hata detaylarını göstermez.
+```
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+// Global hata yakalama endpoint’ine yönlendir
+app.UseExceptionHandler("/error");
+
+app.MapControllers();
+
+app.Run();
+```
+##### ILogger Nedir?
+- ASP.NET Core’un yerleşik loglama arayüzüdür (Microsoft.Extensions.Logging içinde).
+- Farklı log seviyelerinde (Trace, Debug, Information, Warning, Error, Critical) log yazmanı sağlar.
+- Console, Debug, dosya, veri tabanı veya üçüncü taraf (Serilog, NLog) ile kullanılabilir.
+```
+public class HomeController : ControllerBase
+{
+    private readonly ILogger<HomeController> _logger;
+
+    public HomeController(ILogger<HomeController> logger)
+    {
+        _logger = logger;
+    }
+
+    [HttpGet]
+    public IActionResult Index()
+    {
+        _logger.LogInformation("Index metodu çalıştı.");
+        try
+        {
+            throw new Exception("Test hatası");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Bir hata oluştu.");
+        }
+        return Ok();
+    }
+}
+```
+##### UseExceptionHandler + ILogger Birlikte Kullanım
+UseExceptionHandler ile yönlendirdiğin hata endpoint’inde ILogger kullanarak hatayı loglayabilir.
+```
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(); // Console’a log yazmak için
+
+var app = builder.Build();
+
+// Global exception handling
+app.UseExceptionHandler("/error");
+
+// Hata yakalama endpoint’i
+app.Map("/error", (HttpContext context) =>
+{
+    var exceptionFeature = context.Features.Get<IExceptionHandlerFeature>();
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+    // Hata detaylarını logla
+    logger.LogError(exceptionFeature?.Error, "Global hata yakalandı");
+
+    // Kullanıcıya standart bir cevap dön
+    return Results.Problem(
+        title: "Bir hata oluştu",
+        detail: "Sistem yöneticisi ile iletişime geçin.",
+        statusCode: StatusCodes.Status500InternalServerError
+    );
+});
+
+app.MapControllers();
+app.Run();
+```
+- Çalışma Mantığı
+  1. Uygulamada beklenmeyen bir hata oluşur.
+  2. UseExceptionHandler devreye girer ve isteği /error endpoint’ine yönlendirir.
+  3. /error endpoint’i IExceptionHandlerFeature ile hatayı alır.
+  4. ILogger ile hata detaylarını loglar (Console, dosya, veri tabanı vb.).
+  5. Kullanıcıya güvenli, standart bir hata yanıtı döner.
+# 8. Yazılım Geliştirme Prensipleri
+## SOLID Prensipleri
+##### S – Single Responsibility Principle (Tek Sorumluluk İlkesi)
+- Bir sınıfın tek bir sorumluluğu olmalı, değişmesi için tek bir sebebi olmalı.
+- Kodun bakımı ve genişletilmesi kolay olur.
+- Örnek:
+```
+// Kötü Örnek: Hem kullanıcı kaydı hem e-posta gönderme yapıyor
+public class UserService
+{
+    public void Register(string username, string password) { /* kayıt işlemi */ }
+    public void SendEmail(string email) { /* e-posta gönderme */ }
+}
+
+// İyi Örnek: Görevler ayrı sınıflara ayrıldı
+public class UserService
+{
+    public void Register(string username, string password) { /* kayıt işlemi */ }
+}
+public class EmailService
+{
+    public void SendEmail(string email) { /* e-posta gönderme */ }
+}
+```
+##### O – Open/Closed Principle (Açık/Kapalı İlkesi)
+- Sınıflar yeni özellikler eklemeye açık, mevcut kodu değiştirmeye kapalı olmalıdır.
+- Yeni özellik eklerken mevcut kodu bozmamak.
+- Örnek:
+```
+// Kötü Örnek: Yeni ödeme yöntemi eklemek için kodu değiştirmek gerekiyor
+public class PaymentService
+{
+    public void Pay(string method)
+    {
+        if (method == "CreditCard") { /* kredi kartı işlemi */ }
+        else if (method == "PayPal") { /* PayPal işlemi */ }
+    }
+}
+
+//  İyi Örnek: Yeni ödeme eklemek için yeni sınıf yazılır
+public interface IPaymentMethod { void Pay(); }
+public class CreditCardPayment : IPaymentMethod { public void Pay() { } }
+public class PayPalPayment : IPaymentMethod { public void Pay() { } }
+```
+##### L – Liskov Substitution Principle (Liskov’un Yerine Geçme İlkesi)
+- Türetilmiş sınıflar, temel sınıfların yerine sorunsuz geçebilmelidir.
+- Kalıtım ilişkisi doğru kullanılmalı.
+- Örnek:
+```
+// Kötü Örnek: Türeyen sınıf, temel sınıfın davranışını bozuyor
+public class Bird { public virtual void Fly() { } }
+public class Penguin : Bird { public override void Fly() { throw new Exception("Penguen uçamaz"); } }
+
+// İyi Örnek: Ortak davranışlar uygun sınıflara taşındı
+public class Bird { }
+public class FlyingBird : Bird { public void Fly() { } }
+public class Penguin : Bird { }
+```
+#####  I – Interface Segregation Principle (Arayüz Ayrımı İlkesi)
+- Büyük ve kapsamlı arayüzler yerine, ihtiyaca uygun küçük arayüzler oluşturulmalı.
+- Gereksiz metod implementasyonunu engellemek.
+- Örnek:
+```
+// Kötü Örnek: Her yazıcı tarama yapmak zorunda
+public interface IPrinter
+{
+    void Print();
+    void Scan();
+}
+
+public class SimplePrinter : IPrinter
+{
+    public void Print() { }
+    public void Scan() { throw new NotImplementedException(); }
+}
+
+//  İyi Örnek: Ayrı arayüzler tanımlandı
+public interface IPrint { void Print(); }
+public interface IScan { void Scan(); }
+```
+##### D – Dependency Inversion Principle (Bağımlılıkların Tersine Çevrilmesi İlkesi)
+- Yüksek seviye modüller, düşük seviye modüllere değil, soyutlamalara (interface/abstract) bağımlı olmalıdır.
+- Modüller arası bağımlılığı azaltmak.
+- Örnek:
+```
+// Kötü Örnek: Doğrudan somut sınıfa bağımlılık
+public class ReportService
+{
+    private readonly PdfExporter _exporter = new PdfExporter();
+}
+
+// İyi Örnek: Interface’e bağımlılık
+public interface IExporter { void Export(); }
+public class PdfExporter : IExporter { public void Export() { } }
+public class ReportService
+{
+    private readonly IExporter _exporter;
+    public ReportService(IExporter exporter) { _exporter = exporter; }
+}
+```
 
 
 
