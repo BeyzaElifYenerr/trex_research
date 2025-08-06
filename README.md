@@ -910,6 +910,165 @@ public class ReportService
     public ReportService(IExporter exporter) { _exporter = exporter; }
 }
 ```
+## Design Patterns
+##### Singleton Pattern
+- Bir sınıfın uygulama boyunca tek bir örneğinin (instance) olmasını sağlamak.
+- Genellikle konfigürasyon, cache, logging gibi tek noktadan erişilecek servisler için kullanılır.
+- Örnek:
+```
+public class Logger
+{
+    private static Logger _instance;
+    private static readonly object _lock = new object();
+
+    private Logger() { }
+
+    public static Logger Instance
+    {
+        get
+        {
+            lock (_lock) // Thread-safe
+            {
+                if (_instance == null)
+                    _instance = new Logger();
+                return _instance;
+            }
+        }
+    }
+
+    public void Log(string message)
+    {
+        Console.WriteLine(message);
+    }
+}
+
+// Kullanım
+Logger.Instance.Log("Uygulama başladı.");
+```
+##### Repository Pattern
+- Veri erişim kodunu (SQL, EF Core, Dapper vb.) business logic’ten ayırmak.
+- Soyutlama sağlayarak veritabanı teknolojisini değiştirmeyi kolaylaştırmak.
+- Örnek:
+```
+// Model
+public class Product { public int Id { get; set; } public string Name { get; set; } }
+
+// Interface
+public interface IProductRepository
+{
+    IEnumerable<Product> GetAll();
+    Product GetById(int id);
+    void Add(Product product);
+}
+
+// EF Core Repository Implementasyonu
+public class ProductRepository : IProductRepository
+{
+    private readonly AppDbContext _context;
+    public ProductRepository(AppDbContext context) => _context = context;
+
+    public IEnumerable<Product> GetAll() => _context.Products.ToList();
+    public Product GetById(int id) => _context.Products.Find(id);
+    public void Add(Product product)
+    {
+        _context.Products.Add(product);
+        _context.SaveChanges();
+    }
+}
+
+// Kullanım
+public class ProductService
+{
+    private readonly IProductRepository _repo;
+    public ProductService(IProductRepository repo) => _repo = repo;
+
+    public void CreateProduct(string name)
+    {
+        _repo.Add(new Product { Name = name });
+    }
+}
+```
+##### Factory Pattern
+- Nesne oluşturma sürecini merkezi bir yerde yönetmek.
+- Hangi sınıfın üretileceğine çalışma zamanında (runtime) karar verebilmek.
+- Örnek:
+```
+public interface IShape { void Draw(); }
+
+public class Circle : IShape { public void Draw() => Console.WriteLine("Daire çizildi."); }
+public class Square : IShape { public void Draw() => Console.WriteLine("Kare çizildi."); }
+
+public class ShapeFactory
+{
+    public static IShape CreateShape(string shapeType)
+    {
+        return shapeType.ToLower() switch
+        {
+            "circle" => new Circle(),
+            "square" => new Square(),
+            _ => throw new ArgumentException("Geçersiz şekil türü")
+        };
+    }
+}
+
+// Kullanım
+var shape = ShapeFactory.CreateShape("circle");
+shape.Draw();
+```
+## Clean Code Nedir? Neden Önemlidir?
+- Temiz kod, okunabilir, anlaşılır, tekrar kullanılabilir kod yazma yaklaşımıdır.
+- Önemi:
+  - Bakım maliyetini düşürür.
+  - Hata bulmayı kolaylaştırır.
+  - Takım çalışmasını verimli hale getirir.
+- Clean Code Uygulama Örnekleri:
+  - Anlamlı isimler kullan: var c = Calculate() değil, var totalPrice = CalculateTotalPrice()
+  - Metotlar tek iş yapsın.
+  - Gereksiz yorum satırları yerine açıklayıcı kod yaz.
+  - Magic number yerine sabit değişkenler (const) kullan.
+## Yazılım Mimari Desenleri 
+## Layered Architecture (Katmanlı Mimari)
+- Uygulama katmanlara ayrılır (Presentation, Business, Data Access, Database).
+- Her katman sadece bir alt katmanla iletişim kurar.
+- Senaryolar:
+  - Klasik, monolit kurumsal uygulamalar.
+  - Küçük/orta ölçekli projeler.
+  - Uzun vadede mimari karmaşıklık gerektirmeyen sistemler.
+## Clean Architecture
+- Domain (iş kuralları) merkezde, dış katmanlar bağımlı.
+- Bağımlılıklar içten dışa değil, dıştan içe akmaz; tam tersi dıştan içe bağımlılık yoktur.
+- Katmanlar: Domain, Application, Infrastructure, Presentation.
+- Senaryolar:
+  - Büyük, uzun ömürlü projeler.
+  - Bağımsız test edilebilirlik ve bağımlılık yönetimi önemliyse.
+  - Sık değişen altyapı (DB, UI teknolojisi) olan projeler.
+## Microservices Architecture
+- Uygulama bağımsız servisler halinde bölünür.
+- Her servis kendi veritabanına sahip olabilir, bağımsız deploy edilir.
+- Senaryolar:
+  - Büyük ölçekli, yüksek trafikli sistemler.
+  - Her ekibin bağımsız çalıştığı projeler.
+  - Yüksek ölçeklenebilirlik ve esneklik isteyen sistemler (Netflix, Amazon).
+## Event-Driven Architecture
+- Servisler olaylar (event) üzerinden haberleşir.
+- Publisher (yayıncı) olay gönderir, Subscriber (abone) bu olayı dinler.
+- Senaryolar:
+  - Gerçek zamanlı bildirim sistemleri.
+  - IoT, finans, e-ticaret sipariş işleme akışları.
+  - Mikroservislerin loosely coupled iletişim kurması gereken projeler.
+## Hexagonal Architecture (Ports & Adapters)
+- Uygulamanın çekirdeği bağımsızdır, dış dünyayla portlar (arayüzler) ve adapterler (uyarlayıcılar) aracılığıyla konuşur.
+- DB, UI, API gibi dış bileşenler adaptörler ile bağlanır.
+- Senaryolar:
+  - Uygulamanın birden fazla istemci (UI, mobil, API) ile çalışması.
+  - Teknoloji bağımlılığının en aza indirilmek istendiği sistemler.
+| Mimari                 | Kısa Tanım                                         | Tercih Edildiği Durumlar                |
+| ---------------------- | -------------------------------------------------- | --------------------------------------- |
+| **Layered**            | Katmanlara ayrılmış monolit yapı                   | Küçük/orta ölçekli kurumsal projeler    |
+| **Clean Architecture** | Domain merkezli, bağımlılık tersine çevrilmiş yapı | Büyük, uzun ömürlü projeler             |
+| **Microservices**      | Bağımsız deploy edilen servisler                   | Yüksek trafik, ölçeklenebilir sistemler |
+| **Event-Driven**       | Olay tabanlı iletişim                              | Gerçek zamanlı ve asenkron sistemler    |
+| **Hexagonal**          | Ports & Adapters ile teknoloji bağımsız yapı       | Çok istemcili, esnek projeler           |
 
 
 
